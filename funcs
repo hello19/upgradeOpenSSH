@@ -35,7 +35,7 @@ color(){
 }
 
 checkSSLVersion(){
-    sslNewVersion=1.0.2p-fips
+    sslNewVersion=1.1.1d-fips
     sslLocalVersion=`( ssh -V ) 2> /tmp/ssh.tmp;cat /tmp/ssh.tmp |awk -FOpenSSL '{print $2}'|awk '{print $1}'`
     if [[ $sslNewVersion == $sslLocalVersion ]];then
         color green "openssl is the new version"
@@ -51,7 +51,7 @@ checkSSLVersion(){
 }
 
 checkSSHVersion(){
-    sshNewVersion=OpenSSH_7.8p1
+    sshNewVersion=OpenSSH_8.1p1
     sshLocalVersion=`( ssh -V ) 2> /tmp/ssh.tmp;cat /tmp/ssh.tmp|awk -F, '{print $1}'`
     if [[ $sshNewVersion == $sshLocalVersion ]];then
         color green "openssh is the new version"
@@ -112,19 +112,19 @@ upgradeOpenSSL(){
 	make && make install || exit 1
     rm -fr $pwd/package/openssl-fips-2.0.16
     
-    # install openssl 1.0.2
+    # install openssl 1.1.1
     color blue "begin install openssl"
     cd $pwd/package
-    tar zxf openssl-1.0.2p.tar.gz
-    cd openssl-1.0.2p
-    ./config --prefix=/opt/openssl1.0.2p --openssldir=/opt/openssl1.0.2p/openssl fips --with-fipsdir=/opt/fips-2.0.16 zlib-dynamic shared -fPIC|| exit 1
+    tar zxf openssl-1.1.1d.tar.gz
+    cd openssl-1.1.1d
+    ./config --prefix=/opt/openssl1.1.1d --openssldir=/opt/openssl1.1.1d/openssl fips --with-fipsdir=/opt/fips-2.0.16 zlib-dynamic shared -fPIC|| exit 1
     make depend 
     make 
     make test 
     make install|| exit 1
 
-    rm -fr $pwd/package/openssl1.0.2p
-    echo '/opt/openssl1.0.2p/lib' >> /etc/ld.so.conf
+    rm -fr $pwd/package/openssl1.1.1d
+    echo '/opt/openssl1.1.1d/lib' >> /etc/ld.so.conf
     ldconfig
 }
 
@@ -132,13 +132,13 @@ upgradeOpenSSH(){
     # install openssh
     color blue "begin install openssh"
     cd $pwd/package
-	tar zxf openssh-7.8p1.tar.gz
-    cd openssh-7.8p1
-     ./configure --prefix=/opt/openssh7.8p1 --with-ssl-dir=/opt/openssl1.0.2p --with-pam --with-tcp-wrappers --host=x86_64|| exit 1
+	tar zxf openssh-8.1p1.tar.gz
+    cd openssh-8.1p1
+     ./configure --prefix=/opt/openssh8.1p1 --with-ssl-dir=/opt/openssl1.1.1d --with-pam --with-tcp-wrappers --host=x86_64|| exit 1
     make && make install|| exit 1
-    \cp $pwd/etc/sshd_config /opt/openssh7.8p1/etc/
-    \cp /etc/sysconfig/sshd  /opt/openssh7.8p1/etc/
-    rm $pwd/package/openssh7.8p1 -fr
+    \cp $pwd/etc/sshd_config /opt/openssh8.1p1/etc/
+    \cp /etc/sysconfig/sshd  /opt/openssh8.1p1/etc/
+    rm $pwd/package/openssh8.1p1 -fr
     systemctl stop sshd
     systemctl start sshd
     sleep 1
@@ -147,6 +147,6 @@ upgradeOpenSSH(){
 
 addToPath(){
     touch /etc/profile.d/path.sh
-    grep -q "openssh7.8p1" /etc/profile.d/path.sh|| echo 'export PATH=/opt/openssh7.8p1/bin:/opt/openssh7.8p1/sbin:$PATH' >> /etc/profile.d/path.sh
+    grep -q "openssh8.1p1" /etc/profile.d/path.sh|| echo 'export PATH=/opt/openssh8.1p1/bin:/opt/openssh8.1p1/sbin:$PATH' >> /etc/profile.d/path.sh
 	source /etc/profile.d/path.sh
 }
