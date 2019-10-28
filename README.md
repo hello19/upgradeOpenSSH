@@ -11,3 +11,8 @@ source /etc/profile.d/path.sh
 然后即可检查ssh是否升级成功
 ssh -V
 ```
+
+### OpenSSH地址
+`https://openbsd.hk/pub/OpenBSD/OpenSSH/portable/`
+### OpenSSL地址
+`https://ftp.openssl.org/source/`
